@@ -16,7 +16,7 @@
         public bool RecordStarted;
         public bool DeviceTurnedOn;
 
-        public int tmpZero;
+        public int Zero;
 
         protected int tmpValue;
 
@@ -38,6 +38,8 @@
 
         protected int sizeQForDC = 100;
 
+        public bool RemoveZeroMode = true;
+        private int ZeroCountInterval = 250;
 
         public ByteDecomposer(DataArrays data)
         {
@@ -46,6 +48,8 @@
         }
         protected void OnDecomposeLineEvent()
         {
+            if (RemoveZeroMode) return;
+
             OnDecomposePacketEvent?.Invoke(
                 this,
                 new PacketEventArgs
@@ -110,7 +114,7 @@
                         }
 
                         //Массив исходных данный - смещение
-                        Data.RealTimeArray[MainIndex] = tmpValue;
+                        Data.RealTimeArray[MainIndex] = tmpValue - Zero;
                         //Массив постоянной составляющей
                         Data.DCArray[MainIndex] = (int)QueueForDC.Average();
 
@@ -121,6 +125,17 @@
 
                         OnDecomposeLineEvent();
                         PacketCounter++;
+                        if (RemoveZeroMode)
+                        {
+                            if (PacketCounter > ZeroCountInterval)
+                            {
+                                RemoveZeroMode = false;
+                                PacketCounter = 0;
+                                MainIndex = 0;
+                                Zero = (int)QueueForDC.Average();
+                            }
+                        }
+
                         MainIndex++;
                         MainIndex &= DataArrSize - 1;
                         break;
