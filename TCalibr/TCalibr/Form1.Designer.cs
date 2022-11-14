@@ -33,6 +33,7 @@
             this.labPort = new System.Windows.Forms.Label();
             this.labADCValue = new System.Windows.Forms.Label();
             this.panMessages = new System.Windows.Forms.Panel();
+            this.butRepeat = new System.Windows.Forms.Button();
             this.labCoeff = new System.Windows.Forms.Label();
             this.labTargetPressure = new System.Windows.Forms.Label();
             this.labPressButton = new System.Windows.Forms.Label();
@@ -41,7 +42,7 @@
             this.labMessage = new System.Windows.Forms.Label();
             this.panConnect = new System.Windows.Forms.Panel();
             this.panValue = new System.Windows.Forms.Panel();
-            this.button1 = new System.Windows.Forms.Button();
+            this.butSetZero = new System.Windows.Forms.Button();
             this.tbWarning = new System.Windows.Forms.TextBox();
             this.listView1 = new System.Windows.Forms.ListView();
             this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
@@ -61,10 +62,10 @@
             // 
             this.labPort.AutoSize = true;
             this.labPort.Dock = System.Windows.Forms.DockStyle.Top;
-            this.labPort.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.labPort.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.labPort.Location = new System.Drawing.Point(0, 0);
             this.labPort.Name = "labPort";
-            this.labPort.Size = new System.Drawing.Size(52, 21);
+            this.labPort.Size = new System.Drawing.Size(45, 19);
             this.labPort.TabIndex = 0;
             this.labPort.Text = "label1";
             // 
@@ -81,6 +82,7 @@
             // panMessages
             // 
             this.panMessages.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panMessages.Controls.Add(this.butRepeat);
             this.panMessages.Controls.Add(this.labCoeff);
             this.panMessages.Controls.Add(this.labTargetPressure);
             this.panMessages.Controls.Add(this.labPressButton);
@@ -92,6 +94,16 @@
             this.panMessages.Name = "panMessages";
             this.panMessages.Size = new System.Drawing.Size(429, 183);
             this.panMessages.TabIndex = 2;
+            // 
+            // butRepeat
+            // 
+            this.butRepeat.Location = new System.Drawing.Point(281, 139);
+            this.butRepeat.Name = "butRepeat";
+            this.butRepeat.Size = new System.Drawing.Size(100, 23);
+            this.butRepeat.TabIndex = 2;
+            this.butRepeat.Text = "Повторить";
+            this.butRepeat.UseVisualStyleBackColor = true;
+            this.butRepeat.Click += new System.EventHandler(this.butRepeat_Click);
             // 
             // labCoeff
             // 
@@ -126,10 +138,11 @@
             // 
             // butWrite
             // 
+            this.butWrite.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.butWrite.Location = new System.Drawing.Point(154, 139);
             this.butWrite.Name = "butWrite";
             this.butWrite.Size = new System.Drawing.Size(100, 23);
-            this.butWrite.TabIndex = 2;
+            this.butWrite.TabIndex = 1;
             this.butWrite.Text = "Записать";
             this.butWrite.UseVisualStyleBackColor = true;
             this.butWrite.Click += new System.EventHandler(this.butWrite_Click);
@@ -139,7 +152,7 @@
             this.butContinue.Location = new System.Drawing.Point(30, 139);
             this.butContinue.Name = "butContinue";
             this.butContinue.Size = new System.Drawing.Size(100, 23);
-            this.butContinue.TabIndex = 1;
+            this.butContinue.TabIndex = 0;
             this.butContinue.Text = "Продолжить";
             this.butContinue.UseVisualStyleBackColor = true;
             this.butContinue.Click += new System.EventHandler(this.butContinue_Click);
@@ -167,7 +180,7 @@
             // panValue
             // 
             this.panValue.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panValue.Controls.Add(this.button1);
+            this.panValue.Controls.Add(this.butSetZero);
             this.panValue.Controls.Add(this.tbWarning);
             this.panValue.Controls.Add(this.listView1);
             this.panValue.Controls.Add(this.labADCValue);
@@ -177,15 +190,15 @@
             this.panValue.Size = new System.Drawing.Size(429, 243);
             this.panValue.TabIndex = 4;
             // 
-            // button1
+            // butSetZero
             // 
-            this.button1.Location = new System.Drawing.Point(30, 183);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(100, 23);
-            this.button1.TabIndex = 4;
-            this.button1.Text = "Коррекция \"0\"";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.butSetZero.Location = new System.Drawing.Point(30, 183);
+            this.butSetZero.Name = "butSetZero";
+            this.butSetZero.Size = new System.Drawing.Size(100, 23);
+            this.butSetZero.TabIndex = 4;
+            this.butSetZero.Text = "Коррекция \"0\"";
+            this.butSetZero.UseVisualStyleBackColor = true;
+            this.butSetZero.Click += new System.EventHandler(this.button1_Click);
             // 
             // tbWarning
             // 
@@ -198,6 +211,7 @@
             this.tbWarning.Name = "tbWarning";
             this.tbWarning.Size = new System.Drawing.Size(192, 74);
             this.tbWarning.TabIndex = 3;
+            this.tbWarning.TabStop = false;
             this.tbWarning.Text = "Убедитесь, что клапан открыт и здесь отображается 0  ±1";
             // 
             // listView1
@@ -210,6 +224,7 @@
             this.listView1.Scrollable = false;
             this.listView1.Size = new System.Drawing.Size(180, 97);
             this.listView1.TabIndex = 2;
+            this.listView1.TabStop = false;
             this.listView1.UseCompatibleStateImageBehavior = false;
             // 
             // columnHeader1
@@ -230,6 +245,7 @@
             // 
             // Form1
             // 
+            this.AcceptButton = this.butWrite;
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(429, 450);
@@ -267,6 +283,7 @@
         private ColumnHeader columnHeader2;
         private Label labCoeff;
         private TextBox tbWarning;
-        private Button button1;
+        private Button butSetZero;
+        private Button butRepeat;
     }
 }

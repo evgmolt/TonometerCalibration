@@ -1,8 +1,10 @@
+using System.Collections.ObjectModel;
+
 namespace TCalibr
 {
     public partial class Form1 : Form, IMessageHandler
     {
-        static double P0_015 = 112.5092524;
+        static double P0_015 = 112.5092524; //мм.рт.ст для давления P0_0XX
         static double P0_025 = 187.5154207;
         static double P0_035 = 262.5215889;
         static double SumP = (P0_015 + P0_025 + P0_035);
@@ -39,7 +41,6 @@ namespace TCalibr
         private void OnConnectionOk()
         {
             CalibrStep = CalibrationStep.Step015;
-            tbWarning.Visible = true;
         }
 
         public event Action<Message> WindowsMessageHandler;
@@ -64,6 +65,13 @@ namespace TCalibr
 
         private void timerStatus_Tick(object sender, EventArgs e)
         {
+            panValue.Visible = (CalibrStep != CalibrationStep.NoConnected) && 
+                               (CalibrStep != CalibrationStep.ReadyToRecord) && 
+                               (CalibrStep != CalibrationStep.Completed);
+            tbWarning.Visible = CalibrStep == CalibrationStep.Step015;
+            butRepeat.Enabled = (CalibrStep == CalibrationStep.ReadyToRecord) || (CalibrStep == CalibrationStep.Completed);
+            butSetZero.Enabled = CalibrStep == CalibrationStep.Step015;
+
             labMessage.Text = CalibrStep switch
             {
                 CalibrationStep.NoConnected => Messages.Connect,
@@ -74,6 +82,7 @@ namespace TCalibr
                 CalibrationStep.Completed => Messages.Completed,
                 _ => Messages.Connect
             };
+            
 
             labTargetPressure.Text = CalibrStep switch
             {
@@ -132,25 +141,36 @@ namespace TCalibr
                 CalibrationStep.Step015 => "0,015",
                 CalibrationStep.Step025 => "0,025",
                 CalibrationStep.Step035 => "0,035",
+                _ => ""
             };
             listView1.Items.Add(new ListViewItem(new String[] { pressure, CurrentPressure.ToString() }));
             Values.Add(CurrentPressure);
             CalibrStep++;
             if (CalibrStep == CalibrationStep.ReadyToRecord)
             {
+                butWrite.Focus();
                 CalibrationCoeff = Values.Sum() / SumP;
-                labCoeff.Text = CalibrationCoeff.ToString("0.##");
+                labCoeff.Text = "Калибровочный коэффициент : " + CalibrationCoeff.ToString("0.##");
             }
         }
 
         private void butWrite_Click(object sender, EventArgs e)
         {
             CalibrStep = CalibrationStep.Completed;
+            labCoeff.Text = "";
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
             Decomposer.RemoveZeroMode = true;
+        }
+
+        private void butRepeat_Click(object sender, EventArgs e)
+        {
+            Decomposer.RemoveZeroMode = true;
+            CalibrStep = CalibrationStep.Step015;
+            listView1.Items.Clear();
+            labCoeff.Text = "";
         }
     }
 }
