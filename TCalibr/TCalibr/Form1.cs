@@ -12,7 +12,7 @@ namespace TCalibr
         USBSerialPort USBPort;
         DataArrays? DataA;
         ByteDecomposer Decomposer;
-        CalibrationStep CalibrStep = CalibrationStep.NoConnected;
+        CalibrationStep Status = CalibrationStep.NoConnected;
         double CurrentPressure;
         double CalibrationCoeff;
         List<double> Values = new();
@@ -30,8 +30,20 @@ namespace TCalibr
             labMessage.Text = Messages.Connect;
             listView1.View = View.Details;
             labCoeff.Text = "";
+            labTargetPressure.Text = "";
         }
 
+        private void ResetState()
+        {
+            Status = CalibrationStep.Step015;
+            butRepeat.Enabled = false;
+            butWrite.Enabled = false;
+            butContinue.Enabled = true;
+            butSetZero.Enabled = true;
+            listView1.Items.Clear();
+            labCoeff.Text = "";
+            panValue.Visible = true;
+        }
         private void OnPacketReceived(object? sender, PacketEventArgs e)
         {
             CurrentPressure = e.RealTimeValue;
@@ -40,7 +52,15 @@ namespace TCalibr
 
         private void OnConnectionOk()
         {
-            CalibrStep = CalibrationStep.Step015;
+            ResetState();
+        }
+
+        private void OnDisconnected()
+        {
+            butRepeat.Enabled = false;
+            butWrite.Enabled = false;
+            butContinue.Enabled = false;
+            panValue.Visible = false;
         }
 
         public event Action<Message> WindowsMessageHandler;
@@ -65,14 +85,12 @@ namespace TCalibr
 
         private void timerStatus_Tick(object sender, EventArgs e)
         {
-            panValue.Visible = (CalibrStep != CalibrationStep.NoConnected) && 
-                               (CalibrStep != CalibrationStep.ReadyToRecord) && 
-                               (CalibrStep != CalibrationStep.Completed);
-            tbWarning.Visible = CalibrStep == CalibrationStep.Step015;
-            butRepeat.Enabled = (CalibrStep == CalibrationStep.ReadyToRecord) || (CalibrStep == CalibrationStep.Completed);
-            butSetZero.Enabled = CalibrStep == CalibrationStep.Step015;
+            panValue.Visible = (Status != CalibrationStep.NoConnected) && 
+                               (Status != CalibrationStep.Completed);
+            tbWarning.Visible = Status == CalibrationStep.Step015;
+            labValve.Visible = Status == CalibrationStep.Step015;
 
-            labMessage.Text = CalibrStep switch
+            labMessage.Text = Status switch
             {
                 CalibrationStep.NoConnected => Messages.Connect,
                 CalibrationStep.Step015 => Messages.SetPressure,
@@ -84,7 +102,7 @@ namespace TCalibr
             };
             
 
-            labTargetPressure.Text = CalibrStep switch
+            labTargetPressure.Text = Status switch
             {
                 CalibrationStep.Step015 => Messages.Step015,
                 CalibrationStep.Step025 => Messages.Step025,
@@ -92,34 +110,33 @@ namespace TCalibr
                 _ => ""
             };
 
-            labPressButton.Text = CalibrStep switch
+            labPressButton.Text = Status switch
             {
                 CalibrationStep.Step015 => Messages.PressContinue,
                 CalibrationStep.Step025 => Messages.PressContinue,
                 CalibrationStep.Step035 => Messages.PressContinue,
                 CalibrationStep.ReadyToRecord => Messages.PressWrite,
+                CalibrationStep.Completed => Messages.CloseValve,
                 _ => ""
             };
 
-            butContinue.Enabled = (CalibrStep == CalibrationStep.Step015) ||
-                                  (CalibrStep == CalibrationStep.Step025) ||
-                                  (CalibrStep == CalibrationStep.Step035);
-            butWrite.Enabled = CalibrStep == CalibrationStep.ReadyToRecord;
 
-            labADCValue.Visible = (CalibrStep == CalibrationStep.Step015) ||
-                                  (CalibrStep == CalibrationStep.Step025) ||
-                                  (CalibrStep == CalibrationStep.Step035);
+            labADCValue.Visible = (Status == CalibrationStep.Step015) ||
+                                  (Status == CalibrationStep.Step025) ||
+                                  (Status == CalibrationStep.Step035);
 
             if (USBPort == null)
             {
                 labPort.Text = "Тонометр не подключен";
-                CalibrStep = CalibrationStep.NoConnected;
+                OnDisconnected();
+                Status = CalibrationStep.NoConnected;
                 return;
             }
             if (USBPort.PortHandle == null)
             {
                 labPort.Text = "Тонометр не подключен";
-                CalibrStep = CalibrationStep.NoConnected;
+                OnDisconnected();
+                Status = CalibrationStep.NoConnected;
                 return;
             }
             if (USBPort.PortHandle.IsOpen)
@@ -129,14 +146,16 @@ namespace TCalibr
             else
             {
                 labPort.Text = "Тонометр не подключен";
-                CalibrStep = CalibrationStep.NoConnected;
+                OnDisconnected();
+                Status = CalibrationStep.NoConnected;
             }
         }
 
         private void butContinue_Click(object sender, EventArgs e)
         {
             tbWarning.Visible = false;
-            string pressure = CalibrStep switch
+            butSetZero.Enabled = false;
+            string pressure = Status switch
             {
                 CalibrationStep.Step015 => "0,015",
                 CalibrationStep.Step025 => "0,025",
@@ -145,10 +164,12 @@ namespace TCalibr
             };
             listView1.Items.Add(new ListViewItem(new String[] { pressure, CurrentPressure.ToString() }));
             Values.Add(CurrentPressure);
-            CalibrStep++;
-            if (CalibrStep == CalibrationStep.ReadyToRecord)
+            Status++;
+            if (Status == CalibrationStep.ReadyToRecord)
             {
-                butWrite.Focus();
+                butContinue.Enabled = false;
+                butRepeat.Enabled = true;
+                butWrite.Enabled = true;
                 CalibrationCoeff = Values.Sum() / SumP;
                 labCoeff.Text = "Калибровочный коэффициент : " + CalibrationCoeff.ToString("0.##");
             }
@@ -156,7 +177,8 @@ namespace TCalibr
 
         private void butWrite_Click(object sender, EventArgs e)
         {
-            CalibrStep = CalibrationStep.Completed;
+            Status = CalibrationStep.Completed;
+            butWrite.Enabled = false;
             labCoeff.Text = "";
         }
 
@@ -167,10 +189,8 @@ namespace TCalibr
 
         private void butRepeat_Click(object sender, EventArgs e)
         {
+            ResetState();
             Decomposer.RemoveZeroMode = true;
-            CalibrStep = CalibrationStep.Step015;
-            listView1.Items.Clear();
-            labCoeff.Text = "";
         }
     }
 }

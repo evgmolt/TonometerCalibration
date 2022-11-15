@@ -16,5 +16,6 @@ namespace TCalibr
         public static string PressContinue = "Нажмите кнопку [Продолжить]";
         public static string PressWrite = "Нажмите кнопку [Записать]";
         public static string Completed = "Калибровка завершена. Отключите тонометр";
+        public static string CloseValve = "Откройте клапан";
     }
 }
