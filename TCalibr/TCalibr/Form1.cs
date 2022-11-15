@@ -10,7 +10,6 @@ namespace TCalibr
         static double SumP = (P0_015 + P0_025 + P0_035);
 
         USBSerialPort USBPort;
-        DataArrays? DataA;
         ByteDecomposer Decomposer;
         CalibrationStep Status = CalibrationStep.NoConnected;
         double CurrentPressure;
@@ -21,8 +20,7 @@ namespace TCalibr
         {
             InitializeComponent();
             string ConnectionString = "USBSER";
-            DataA = new DataArrays(ByteDecomposer.DataArrSize);
-            Decomposer = new ByteDecomposer(DataA);
+            Decomposer = new ByteDecomposer();
             Decomposer.OnDecomposePacketEvent += OnPacketReceived;
             USBPort = new USBSerialPort(this, Decomposer.BaudRate, ConnectionString);
             USBPort.ConnectionOk += OnConnectionOk;
@@ -36,12 +34,12 @@ namespace TCalibr
 
         private void SetColors()
         {
-            Color butColor = SystemColors.Control;
             Color panColor = Color.AliceBlue;
-            butSetZero.BackColor = butColor;
-            butContinue.BackColor = butColor;
-            butRepeat.BackColor = butColor;
-            butWrite.BackColor = butColor;
+            //Color butColor = SystemColors.Control;
+            //butSetZero.BackColor = butColor;
+            //butContinue.BackColor = butColor;
+            //butRepeat.BackColor = butColor;
+            //butWrite.BackColor = butColor;
             panConnect.BackColor = panColor;
             panMessages.BackColor = panColor;
             panValue.BackColor = panColor;
@@ -85,7 +83,7 @@ namespace TCalibr
         {
             if (USBPort?.PortHandle?.IsOpen == true)
             {
-                Decomposer?.Decompos(USBPort, null, null);
+                Decomposer?.Decompos(USBPort);
             }
         }
 
@@ -115,8 +113,7 @@ namespace TCalibr
                 CalibrationStep.ReadyToRecord => "",
                 CalibrationStep.Completed => Messages.Completed,
                 _ => Messages.Connect
-            };
-            
+            };            
 
             labTargetPressure.Text = Status switch
             {
@@ -136,21 +133,20 @@ namespace TCalibr
                 _ => ""
             };
 
-
             labADCValue.Visible = (Status == CalibrationStep.Step015) ||
                                   (Status == CalibrationStep.Step025) ||
                                   (Status == CalibrationStep.Step035);
 
             if (USBPort == null)
             {
-                labPort.Text = "Тонометр не подключен";
+                labPort.Text = Messages.NoConnection;
                 OnDisconnected();
                 Status = CalibrationStep.NoConnected;
                 return;
             }
             if (USBPort.PortHandle == null)
             {
-                labPort.Text = "Тонометр не подключен";
+                labPort.Text = Messages.NoConnection;
                 OnDisconnected();
                 Status = CalibrationStep.NoConnected;
                 return;
@@ -161,7 +157,7 @@ namespace TCalibr
             }
             else
             {
-                labPort.Text = "Тонометр не подключен";
+                labPort.Text = Messages.NoConnection;
                 OnDisconnected();
                 Status = CalibrationStep.NoConnected;
             }
@@ -198,7 +194,7 @@ namespace TCalibr
             labCoeff.Text = "";
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void butSetZero_Click(object sender, EventArgs e)
         {
             Decomposer.RemoveZeroMode = true;
         }

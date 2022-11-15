@@ -8,6 +8,7 @@ namespace TCalibr
 {
     internal static class Messages
     {
+        public static string NoConnection = "Тонометр не подключен";
         public static string Connect = "Подключите тонометр";
         public static string SetPressure = "Установите значение давления";
         public static string Step015 = "0,015 МПа";
