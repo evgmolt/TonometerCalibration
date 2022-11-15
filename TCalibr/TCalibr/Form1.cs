@@ -31,6 +31,22 @@ namespace TCalibr
             listView1.View = View.Details;
             labCoeff.Text = "";
             labTargetPressure.Text = "";
+            SetColors();
+        }
+
+        private void SetColors()
+        {
+            Color butColor = SystemColors.Control;
+            Color panColor = Color.AliceBlue;
+            butSetZero.BackColor = butColor;
+            butContinue.BackColor = butColor;
+            butRepeat.BackColor = butColor;
+            butWrite.BackColor = butColor;
+            panConnect.BackColor = panColor;
+            panMessages.BackColor = panColor;
+            panValue.BackColor = panColor;
+            tbWarning.BackColor = panColor;
+            tableLayoutPanel1.BackColor = panColor;
         }
 
         private void ResetState()

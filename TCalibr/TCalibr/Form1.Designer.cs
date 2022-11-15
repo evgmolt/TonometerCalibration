@@ -76,7 +76,7 @@
             // 
             this.labADCValue.AutoSize = true;
             this.labADCValue.Font = new System.Drawing.Font("Segoe UI", 20.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.labADCValue.Location = new System.Drawing.Point(24, 80);
+            this.labADCValue.Location = new System.Drawing.Point(24, 71);
             this.labADCValue.Name = "labADCValue";
             this.labADCValue.Size = new System.Drawing.Size(33, 37);
             this.labADCValue.TabIndex = 1;
@@ -135,7 +135,7 @@
             // 
             this.labPressButton.AutoSize = true;
             this.labPressButton.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.labPressButton.Location = new System.Drawing.Point(30, 62);
+            this.labPressButton.Location = new System.Drawing.Point(30, 68);
             this.labPressButton.Name = "labPressButton";
             this.labPressButton.Size = new System.Drawing.Size(125, 21);
             this.labPressButton.TabIndex = 3;
@@ -204,7 +204,7 @@
             this.labValve.AutoSize = true;
             this.labValve.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.labValve.ForeColor = System.Drawing.Color.Red;
-            this.labValve.Location = new System.Drawing.Point(24, 117);
+            this.labValve.Location = new System.Drawing.Point(24, 156);
             this.labValve.Name = "labValve";
             this.labValve.Size = new System.Drawing.Size(144, 21);
             this.labValve.TabIndex = 6;
@@ -212,7 +212,7 @@
             // 
             // butSetZero
             // 
-            this.butSetZero.Location = new System.Drawing.Point(24, 154);
+            this.butSetZero.Location = new System.Drawing.Point(24, 111);
             this.butSetZero.Name = "butSetZero";
             this.butSetZero.Size = new System.Drawing.Size(100, 23);
             this.butSetZero.TabIndex = 4;
