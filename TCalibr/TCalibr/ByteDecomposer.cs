@@ -32,12 +32,12 @@
         protected int sizeQForValue = 20;
 
         public bool RemoveZeroMode = true;
-        private int ZeroCountInterval = 120;
+        private int ZeroCountInterval = 5;
 
         public ByteDecomposer()
         {
-            QueueForZero = new Queue<int>(sizeQForZero);
-            QueueForValue = new Queue<int>(sizeQForValue);
+            QueueForZero = new Queue<int>();
+            QueueForValue = new Queue<int>();
         }
         protected void OnDecomposeLineEvent()
         {
@@ -70,12 +70,18 @@
                         break;
                     case 2:
                         tmpValue += 0x100 * usbport.PortBuf[i];
+                        byteNum = 3;
+                        break;
+                    case 3:
+                        byteNum = 4;
+                        break;
+                    case 4:
+                        
                         if ((tmpValue & 0x8000) != 0)
                         {
                             tmpValue -= 0x10000;
                         }
 
-                        //Очередь для выделения постоянной составляющей
                         QueueForZero.Enqueue(tmpValue);
                         if (QueueForZero.Count > sizeQForZero)
                         {
@@ -88,7 +94,6 @@
                             QueueForValue.Dequeue();
                         }
 
-                        //Массив переменной составляющей
                         byteNum = 0;
 
                         PacketCounter++;

@@ -3,11 +3,6 @@ using System.IO.Ports;
 
 namespace TCalibr
 {
-    public interface IMessageHandler
-    {
-        event Action<Message> WindowsMessageHandler;
-    }
-
     public class USBSerialPort
     {
         private const int _USBTimerInterval = 25;
@@ -24,7 +19,6 @@ namespace TCalibr
 
         public event Action<Exception> ConnectionFailure;
         public event Action ConnectionOk;
-        public event Action<Message> WindowsMessageHandler;
 
         private readonly string _connectionString;
 

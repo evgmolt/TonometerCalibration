@@ -8,12 +8,12 @@ namespace TCalibr
         static double P0_025 = 187.5154207;
         static double P0_035 = 262.5215889;
         static double SumP = (P0_015 + P0_025 + P0_035);
+        double CalibrationCoeff;
 
         USBSerialPort USBPort;
         ByteDecomposer Decomposer;
         CalibrationStep Status = CalibrationStep.NoConnected;
         double CurrentPressure;
-        double CalibrationCoeff;
         List<double> Values = new();
 
         public Form1()
@@ -25,11 +25,22 @@ namespace TCalibr
             USBPort = new USBSerialPort(this, Decomposer.BaudRate, ConnectionString);
             USBPort.ConnectionOk += OnConnectionOk;
             USBPort.Connect();
-            labMessage.Text = Messages.Connect;
+            labMessage.Text = MessagesStrings.Connect;
             listView1.View = View.Details;
             labCoeff.Text = "";
             labTargetPressure.Text = "";
             SetColors();
+        }
+
+        public event Action<Message> WindowsMessageHandler;
+        protected override void WndProc(ref Message m)
+        {
+            const int WM_DEVICECHANGE = 0x0219;
+            if (m.Msg == WM_DEVICECHANGE)
+            {
+                WindowsMessageHandler?.Invoke(m);
+            }
+            base.WndProc(ref m);
         }
 
         private void SetColors()
@@ -58,6 +69,7 @@ namespace TCalibr
             labCoeff.Text = "";
             panValue.Visible = true;
         }
+
         private void OnPacketReceived(object? sender, PacketEventArgs e)
         {
             CurrentPressure = e.RealTimeValue;
@@ -77,24 +89,12 @@ namespace TCalibr
             panValue.Visible = false;
         }
 
-        public event Action<Message> WindowsMessageHandler;
-
         private void timerRead_Tick(object sender, EventArgs e)
         {
             if (USBPort?.PortHandle?.IsOpen == true)
             {
                 Decomposer?.Decompos(USBPort);
             }
-        }
-
-        protected override void WndProc(ref Message m)
-        {
-            const int WM_DEVICECHANGE = 0x0219;
-            if (m.Msg == WM_DEVICECHANGE)
-            {
-                WindowsMessageHandler?.Invoke(m);
-            }
-            base.WndProc(ref m);
         }
 
         private void timerStatus_Tick(object sender, EventArgs e)
@@ -106,30 +106,30 @@ namespace TCalibr
 
             labMessage.Text = Status switch
             {
-                CalibrationStep.NoConnected => Messages.Connect,
-                CalibrationStep.Step015 => Messages.SetPressure,
-                CalibrationStep.Step025 => Messages.SetPressure,
-                CalibrationStep.Step035 => Messages.SetPressure,
+                CalibrationStep.NoConnected => MessagesStrings.Connect,
+                CalibrationStep.Step015 => MessagesStrings.SetPressure,
+                CalibrationStep.Step025 => MessagesStrings.SetPressure,
+                CalibrationStep.Step035 => MessagesStrings.SetPressure,
                 CalibrationStep.ReadyToRecord => "",
-                CalibrationStep.Completed => Messages.Completed,
-                _ => Messages.Connect
+                CalibrationStep.Completed => MessagesStrings.Completed,
+                _ => MessagesStrings.Connect
             };            
 
             labTargetPressure.Text = Status switch
             {
-                CalibrationStep.Step015 => Messages.Step015,
-                CalibrationStep.Step025 => Messages.Step025,
-                CalibrationStep.Step035 => Messages.Step035,
+                CalibrationStep.Step015 => MessagesStrings.Step015,
+                CalibrationStep.Step025 => MessagesStrings.Step025,
+                CalibrationStep.Step035 => MessagesStrings.Step035,
                 _ => ""
             };
 
             labPressButton.Text = Status switch
             {
-                CalibrationStep.Step015 => Messages.PressContinue,
-                CalibrationStep.Step025 => Messages.PressContinue,
-                CalibrationStep.Step035 => Messages.PressContinue,
-                CalibrationStep.ReadyToRecord => Messages.PressWrite,
-                CalibrationStep.Completed => Messages.CloseValve,
+                CalibrationStep.Step015 => MessagesStrings.PressContinue,
+                CalibrationStep.Step025 => MessagesStrings.PressContinue,
+                CalibrationStep.Step035 => MessagesStrings.PressContinue,
+                CalibrationStep.ReadyToRecord => MessagesStrings.PressWrite,
+                CalibrationStep.Completed => MessagesStrings.CloseValve,
                 _ => ""
             };
 
@@ -139,14 +139,14 @@ namespace TCalibr
 
             if (USBPort == null)
             {
-                labPort.Text = Messages.NoConnection;
+                labPort.Text = MessagesStrings.NoConnection;
                 OnDisconnected();
                 Status = CalibrationStep.NoConnected;
                 return;
             }
             if (USBPort.PortHandle == null)
             {
-                labPort.Text = Messages.NoConnection;
+                labPort.Text = MessagesStrings.NoConnection;
                 OnDisconnected();
                 Status = CalibrationStep.NoConnected;
                 return;
@@ -157,7 +157,7 @@ namespace TCalibr
             }
             else
             {
-                labPort.Text = Messages.NoConnection;
+                labPort.Text = MessagesStrings.NoConnection;
                 OnDisconnected();
                 Status = CalibrationStep.NoConnected;
             }
@@ -189,9 +189,18 @@ namespace TCalibr
 
         private void butWrite_Click(object sender, EventArgs e)
         {
+            CalibrationCoeff = 18.69;
+            byte coommandWriteCoeff = 11;
             Status = CalibrationStep.Completed;
             butWrite.Enabled = false;
             labCoeff.Text = "";
+            double RoundedCoeff = Math.Round(CalibrationCoeff, 2);
+            double floor = Math.Floor(RoundedCoeff);
+            double fract = Math.Floor((RoundedCoeff - floor) * 100);
+            byte first = (byte)floor;
+            byte second = (byte)fract;
+            byte[] buf = { coommandWriteCoeff, first, second };
+            USBPort.WriteBuf(buf);
         }
 
         private void butSetZero_Click(object sender, EventArgs e)
@@ -203,6 +212,11 @@ namespace TCalibr
         {
             ResetState();
             Decomposer.RemoveZeroMode = true;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            butWrite_Click(null, EventArgs.Empty);
         }
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TCalibr
 {
-    internal static class Messages
+    internal static class MessagesStrings
     {
         public static string NoConnection = "Тонометр не подключен";
         public static string Connect = "Подключите тонометр";

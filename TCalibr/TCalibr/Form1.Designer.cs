@@ -33,6 +33,7 @@
             this.labPort = new System.Windows.Forms.Label();
             this.labADCValue = new System.Windows.Forms.Label();
             this.panMessages = new System.Windows.Forms.Panel();
+            this.button1 = new System.Windows.Forms.Button();
             this.butRepeat = new System.Windows.Forms.Button();
             this.labCoeff = new System.Windows.Forms.Label();
             this.labTargetPressure = new System.Windows.Forms.Label();
@@ -86,6 +87,7 @@
             // 
             this.panMessages.BackColor = System.Drawing.SystemColors.Control;
             this.panMessages.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panMessages.Controls.Add(this.button1);
             this.panMessages.Controls.Add(this.butRepeat);
             this.panMessages.Controls.Add(this.labCoeff);
             this.panMessages.Controls.Add(this.labTargetPressure);
@@ -98,6 +100,17 @@
             this.panMessages.Name = "panMessages";
             this.panMessages.Size = new System.Drawing.Size(414, 200);
             this.panMessages.TabIndex = 2;
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(274, 90);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 6;
+            this.button1.Text = "button1";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Visible = false;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // butRepeat
             // 
@@ -179,6 +192,7 @@
             this.listView1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader1,
             this.columnHeader2});
+            this.listView1.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.listView1.Location = new System.Drawing.Point(201, 94);
             this.listView1.Name = "listView1";
             this.listView1.Scrollable = false;
@@ -290,6 +304,7 @@
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "Form1";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Калибровка тонометра";
             this.panMessages.ResumeLayout(false);
             this.panMessages.PerformLayout();
@@ -325,5 +340,6 @@
         private Button butRepeat;
         private Label labValve;
         private TableLayoutPanel tableLayoutPanel1;
+        private Button button1;
     }
 }
