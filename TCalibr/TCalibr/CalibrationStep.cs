@@ -9,9 +9,9 @@ namespace TCalibr
     internal enum CalibrationStep
     {
         NoConnected,
-        Step015,
-        Step025,
-        Step035,
+        Step01,
+        Step02,
+        Step03,
         ReadyToRecord,
         Completed
     }

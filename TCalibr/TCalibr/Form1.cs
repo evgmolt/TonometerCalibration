@@ -1,13 +1,15 @@
-using System.Collections.ObjectModel;
-
 namespace TCalibr
 {
     public partial class Form1 : Form, IMessageHandler
     {
-        static double P0_015 = 112.5092524; //мм.рт.ст для давления P0_0XX
-        static double P0_025 = 187.5154207;
-        static double P0_035 = 262.5215889;
-        static double SumP = (P0_015 + P0_025 + P0_035);
+        static double P_Step1 = 100;
+        static double P_Step2 = 200;
+        static double P_Step3 = 250;
+        static double SumP = (P_Step1 + P_Step2 + P_Step3);
+        //static double P_Step1 = 116.2; //мм.рт.ст для давления P0_0XX
+        //static double P_Step2 = 191.2;
+        //static double P_Step3 = 266.6;
+        //static double SumP = (P_Step1 + P_Step2 + P_Step3);
         double CalibrationCoeff;
 
         USBSerialPort USBPort;
@@ -60,7 +62,7 @@ namespace TCalibr
 
         private void ResetState()
         {
-            Status = CalibrationStep.Step015;
+            Status = CalibrationStep.Step01;
             butRepeat.Enabled = false;
             butWrite.Enabled = false;
             butContinue.Enabled = true;
@@ -101,15 +103,15 @@ namespace TCalibr
         {
             panValue.Visible = (Status != CalibrationStep.NoConnected) && 
                                (Status != CalibrationStep.Completed);
-            tbWarning.Visible = Status == CalibrationStep.Step015;
-            labValve.Visible = Status == CalibrationStep.Step015;
+            tbWarning.Visible = Status == CalibrationStep.Step01;
+            labValve.Visible = Status == CalibrationStep.Step01;
 
             labMessage.Text = Status switch
             {
                 CalibrationStep.NoConnected => MessagesStrings.Connect,
-                CalibrationStep.Step015 => MessagesStrings.SetPressure,
-                CalibrationStep.Step025 => MessagesStrings.SetPressure,
-                CalibrationStep.Step035 => MessagesStrings.SetPressure,
+                CalibrationStep.Step01 => MessagesStrings.SetPressure,
+                CalibrationStep.Step02 => MessagesStrings.SetPressure,
+                CalibrationStep.Step03 => MessagesStrings.SetPressure,
                 CalibrationStep.ReadyToRecord => "",
                 CalibrationStep.Completed => MessagesStrings.Completed,
                 _ => MessagesStrings.Connect
@@ -117,25 +119,25 @@ namespace TCalibr
 
             labTargetPressure.Text = Status switch
             {
-                CalibrationStep.Step015 => MessagesStrings.Step015,
-                CalibrationStep.Step025 => MessagesStrings.Step025,
-                CalibrationStep.Step035 => MessagesStrings.Step035,
+                CalibrationStep.Step01 => MessagesStrings.Step01,
+                CalibrationStep.Step02 => MessagesStrings.Step02,
+                CalibrationStep.Step03 => MessagesStrings.Step03,
                 _ => ""
             };
 
             labPressButton.Text = Status switch
             {
-                CalibrationStep.Step015 => MessagesStrings.PressContinue,
-                CalibrationStep.Step025 => MessagesStrings.PressContinue,
-                CalibrationStep.Step035 => MessagesStrings.PressContinue,
+                CalibrationStep.Step01 => MessagesStrings.PressContinue,
+                CalibrationStep.Step02 => MessagesStrings.PressContinue,
+                CalibrationStep.Step03 => MessagesStrings.PressContinue,
                 CalibrationStep.ReadyToRecord => MessagesStrings.PressWrite,
                 CalibrationStep.Completed => MessagesStrings.CloseValve,
                 _ => ""
             };
 
-            labADCValue.Visible = (Status == CalibrationStep.Step015) ||
-                                  (Status == CalibrationStep.Step025) ||
-                                  (Status == CalibrationStep.Step035);
+            labADCValue.Visible = (Status == CalibrationStep.Step01) ||
+                                  (Status == CalibrationStep.Step02) ||
+                                  (Status == CalibrationStep.Step03);
 
             if (USBPort == null)
             {
@@ -169,9 +171,9 @@ namespace TCalibr
             butSetZero.Enabled = false;
             string pressure = Status switch
             {
-                CalibrationStep.Step015 => "0,015",
-                CalibrationStep.Step025 => "0,025",
-                CalibrationStep.Step035 => "0,035",
+                CalibrationStep.Step01 => MessagesStrings.Step01,
+                CalibrationStep.Step02 => MessagesStrings.Step02,
+                CalibrationStep.Step03 => MessagesStrings.Step03,
                 _ => ""
             };
             listView1.Items.Add(new ListViewItem(new String[] { pressure, CurrentPressure.ToString() }));
@@ -189,7 +191,6 @@ namespace TCalibr
 
         private void butWrite_Click(object sender, EventArgs e)
         {
-            CalibrationCoeff = 18.69;
             byte coommandWriteCoeff = 11;
             Status = CalibrationStep.Completed;
             butWrite.Enabled = false;
