@@ -24,6 +24,10 @@
         public int BytesInPacket => 3;
         public int MaxNoDataCounter => 10;
 
+        public bool WaitNumberMode = true;
+        public byte[] SerialNumArr = new byte[13];
+        public string SerialNumStr;
+
         //Очереди для усреднения скользящим окном
         protected Queue<int> QueueForZero;
         protected Queue<int> QueueForValue;
@@ -33,6 +37,8 @@
 
         public bool RemoveZeroMode = true;
         private int ZeroCountInterval = 5;
+
+        private int NumIndex = 0;
 
         public ByteDecomposer()
         {
@@ -54,6 +60,25 @@
         public int Decompos(USBSerialPort usbport)
         {
             int bytes = usbport.BytesRead;
+            if (bytes == 0) return 0;
+            if (WaitNumberMode)
+            {
+                for (int i = 0; i < bytes; i++)
+                {
+                    if (usbport.PortBuf[i] == 12) continue;
+                    SerialNumArr[NumIndex] = usbport.PortBuf[i];
+                    NumIndex++;
+                    if (NumIndex == 13)
+                    {
+                        WaitNumberMode = false;
+                        NumIndex = 0;
+                        SerialNumStr = new string(SerialNumArr.Select(c => Convert.ToChar(c)).ToArray());
+                        break;
+                    }
+                }
+                usbport.BytesRead = 0;
+                return bytes;
+            }
             for (int i = 0; i < bytes; i++)
             {
                 switch (byteNum)

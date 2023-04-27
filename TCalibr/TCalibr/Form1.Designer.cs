@@ -33,7 +33,6 @@
             this.labPort = new System.Windows.Forms.Label();
             this.labADCValue = new System.Windows.Forms.Label();
             this.panMessages = new System.Windows.Forms.Panel();
-            this.button1 = new System.Windows.Forms.Button();
             this.butRepeat = new System.Windows.Forms.Button();
             this.labCoeff = new System.Windows.Forms.Label();
             this.labTargetPressure = new System.Windows.Forms.Label();
@@ -87,7 +86,6 @@
             // 
             this.panMessages.BackColor = System.Drawing.SystemColors.Control;
             this.panMessages.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panMessages.Controls.Add(this.button1);
             this.panMessages.Controls.Add(this.butRepeat);
             this.panMessages.Controls.Add(this.labCoeff);
             this.panMessages.Controls.Add(this.labTargetPressure);
@@ -98,19 +96,8 @@
             this.panMessages.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panMessages.Location = new System.Drawing.Point(3, 214);
             this.panMessages.Name = "panMessages";
-            this.panMessages.Size = new System.Drawing.Size(414, 200);
+            this.panMessages.Size = new System.Drawing.Size(430, 200);
             this.panMessages.TabIndex = 2;
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(317, 6);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 6;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Visible = false;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // butRepeat
             // 
@@ -218,7 +205,7 @@
             this.panConnect.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panConnect.Location = new System.Drawing.Point(3, 420);
             this.panConnect.Name = "panConnect";
-            this.panConnect.Size = new System.Drawing.Size(414, 27);
+            this.panConnect.Size = new System.Drawing.Size(430, 27);
             this.panConnect.TabIndex = 3;
             // 
             // panValue
@@ -232,7 +219,7 @@
             this.panValue.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panValue.Location = new System.Drawing.Point(3, 3);
             this.panValue.Name = "panValue";
-            this.panValue.Size = new System.Drawing.Size(414, 205);
+            this.panValue.Size = new System.Drawing.Size(430, 205);
             this.panValue.TabIndex = 4;
             this.panValue.Visible = false;
             // 
@@ -281,6 +268,7 @@
             // 
             this.tableLayoutPanel1.ColumnCount = 1;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel1.Controls.Add(this.panConnect, 0, 2);
             this.tableLayoutPanel1.Controls.Add(this.panValue, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.panMessages, 0, 1);
@@ -291,7 +279,7 @@
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.59952F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 49.40048F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(420, 450);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(436, 450);
             this.tableLayoutPanel1.TabIndex = 5;
             // 
             // Form1
@@ -299,7 +287,7 @@
             this.AcceptButton = this.butWrite;
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(420, 450);
+            this.ClientSize = new System.Drawing.Size(436, 450);
             this.Controls.Add(this.tableLayoutPanel1);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
@@ -340,6 +328,5 @@
         private Button butRepeat;
         private Label labValve;
         private TableLayoutPanel tableLayoutPanel1;
-        private Button button1;
     }
 }

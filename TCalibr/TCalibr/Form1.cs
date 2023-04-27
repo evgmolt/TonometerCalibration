@@ -2,6 +2,9 @@ namespace TCalibr
 {
     public partial class Form1 : Form, IMessageHandler
     {
+        const byte coommandWriteCoeff = 11;
+        const byte coommandGetNumber = 12;
+        string LogFileName = "hisory.txt";
         static double P_Step1 = 100;
         static double P_Step2 = 200;
         static double P_Step3 = 250;
@@ -62,7 +65,11 @@ namespace TCalibr
 
         private void ResetState()
         {
-            Status = CalibrationStep.Step01;
+            Status = CalibrationStep.GetNumber;
+            USBPort.WriteByte(coommandGetNumber);
+            USBPort.PortHandle.BaseStream.Flush();
+            USBPort.BytesRead = 0;
+            Thread.Sleep(1000);
             butRepeat.Enabled = false;
             butWrite.Enabled = false;
             butContinue.Enabled = true;
@@ -89,6 +96,7 @@ namespace TCalibr
             butWrite.Enabled = false;
             butContinue.Enabled = false;
             panValue.Visible = false;
+            Text = "Калибровка тонометра ";
         }
 
         private void timerRead_Tick(object sender, EventArgs e)
@@ -96,6 +104,11 @@ namespace TCalibr
             if (USBPort?.PortHandle?.IsOpen == true)
             {
                 Decomposer?.Decompos(USBPort);
+                if (!Decomposer.WaitNumberMode)
+                {
+                    Status = CalibrationStep.Step01;
+                    Text = "Калибровка тонометра " + Decomposer.SerialNumStr;
+                }
             }
         }
 
@@ -191,7 +204,6 @@ namespace TCalibr
 
         private void butWrite_Click(object sender, EventArgs e)
         {
-            byte coommandWriteCoeff = 11;
             Status = CalibrationStep.Completed;
             butWrite.Enabled = false;
             labCoeff.Text = "";
@@ -202,6 +214,7 @@ namespace TCalibr
             byte second = (byte)fract;
             byte[] buf = { coommandWriteCoeff, first, second };
             USBPort.WriteBuf(buf);
+            File.WriteAllText(LogFileName, DateTime.Now.ToString("dd.MM.yy hh:mm") + " " + Decomposer.SerialNumStr + " " + RoundedCoeff.ToString());
         }
 
         private void butSetZero_Click(object sender, EventArgs e)
@@ -213,11 +226,6 @@ namespace TCalibr
         {
             ResetState();
             Decomposer.RemoveZeroMode = true;
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            butWrite_Click(null, EventArgs.Empty);
         }
     }
 }

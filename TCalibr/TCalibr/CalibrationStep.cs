@@ -9,6 +9,8 @@ namespace TCalibr
     internal enum CalibrationStep
     {
         NoConnected,
+        WaitNumber,
+        GetNumber,
         Step01,
         Step02,
         Step03,
