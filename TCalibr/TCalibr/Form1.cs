@@ -65,7 +65,7 @@ namespace TCalibr
 
         private void ResetState()
         {
-            Status = CalibrationStep.GetNumber;
+            Status = CalibrationStep.Step01;
             USBPort.WriteByte(coommandGetNumber);
             USBPort.PortHandle.BaseStream.Flush();
             USBPort.BytesRead = 0;
@@ -106,7 +106,7 @@ namespace TCalibr
                 Decomposer?.Decompos(USBPort);
                 if (!Decomposer.WaitNumberMode)
                 {
-                    Status = CalibrationStep.Step01;
+//                    Status = CalibrationStep.Step01;
                     Text = "Калибровка тонометра " + Decomposer.SerialNumStr;
                 }
             }
@@ -208,13 +208,14 @@ namespace TCalibr
             butWrite.Enabled = false;
             labCoeff.Text = "";
             double RoundedCoeff = Math.Round(CalibrationCoeff, 2);
+            RoundedCoeff = 18.1;
             double floor = Math.Floor(RoundedCoeff);
             double fract = Math.Floor((RoundedCoeff - floor) * 100);
             byte first = (byte)floor;
             byte second = (byte)fract;
             byte[] buf = { coommandWriteCoeff, first, second };
             USBPort.WriteBuf(buf);
-            File.WriteAllText(LogFileName, DateTime.Now.ToString("dd.MM.yy hh:mm") + " " + Decomposer.SerialNumStr + " " + RoundedCoeff.ToString());
+            File.AppendAllText(LogFileName, DateTime.Now.ToString("dd.MM.yy hh:mm") + " " + Decomposer.SerialNumStr + " " + RoundedCoeff.ToString());
         }
 
         private void butSetZero_Click(object sender, EventArgs e)
